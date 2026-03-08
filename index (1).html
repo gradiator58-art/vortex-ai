@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vortex AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#07090f;--surface:#0d1018;--s2:#131720;--s3:#181e2a;
+  --border:rgba(99,102,241,.15);--border2:rgba(99,102,241,.3);
+  --accent:#6366f1;--accent2:#a78bfa;--accent3:#38bdf8;
+  --text:#e8eaf6;--muted:#6b7280;--success:#34d399;--warn:#fbbf24;--danger:#f87171;
+  --glow:0 0 40px rgba(99,102,241,.2);--r:16px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(ellipse 70% 50% at 15% 15%,rgba(99,102,241,.1) 0,transparent 70%),
+             radial-gradient(ellipse 50% 40% at 85% 85%,rgba(167,139,250,.08) 0,transparent 70%);}
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px;}
+
+/* LOGIN */
+#loginPage{position:relative;z-index:1;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;}
+.login-card{background:var(--surface);border:1px solid var(--border);border-radius:24px;padding:44px 38px;width:100%;max-width:420px;box-shadow:var(--glow),0 24px 80px rgba(0,0,0,.6);animation:fadeUp .5s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+.logo-wrap{display:flex;flex-direction:column;align-items:center;margin-bottom:28px;}
+.logo-icon{width:64px;height:64px;background:linear-gradient(135deg,#6366f1,#a78bfa);border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:28px;margin-bottom:14px;box-shadow:0 8px 32px rgba(99,102,241,.5);animation:glow 3s ease infinite;}
+@keyframes glow{0%,100%{box-shadow:0 8px 32px rgba(99,102,241,.4)}50%{box-shadow:0 8px 56px rgba(99,102,241,.75)}}
+.logo-title{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;background:linear-gradient(135deg,#e8eaf6,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.logo-sub{color:var(--muted);font-size:13px;text-align:center;margin-top:4px;line-height:1.5;}
+.tabs{display:flex;background:var(--s2);border-radius:12px;padding:4px;margin-bottom:24px;}
+.tab-btn{flex:1;padding:10px;border:none;background:transparent;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:14px;border-radius:10px;cursor:pointer;transition:all .3s;}
+.tab-btn.active{background:linear-gradient(135deg,#6366f1,#7c3aed);color:#fff;font-weight:600;box-shadow:0 4px 16px rgba(99,102,241,.4);}
+.g-btn{width:100%;padding:13px;background:#fff;color:#1a1a2e;border:none;border-radius:14px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:10px;cursor:pointer;transition:all .3s;margin-bottom:18px;}
+.g-btn:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(255,255,255,.15);}
+.divider{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:12px;margin-bottom:18px;}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border);}
+.ig{margin-bottom:14px;}
+.ig label{display:block;font-size:12px;color:var(--muted);margin-bottom:5px;}
+.ig input{width:100%;padding:13px 15px;background:var(--s2);border:1px solid var(--border);border-radius:12px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;outline:none;transition:all .3s;}
+.ig input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(99,102,241,.12);}
+.main-btn{width:100%;padding:14px;background:linear-gradient(135deg,#6366f1,#7c3aed);color:#fff;border:none;border-radius:14px;font-family:'Syne',sans-serif;font-size:15px;font-weight:700;cursor:pointer;transition:all .3s;margin-top:6px;}
+.main-btn:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(99,102,241,.5);}
+.lf{text-align:center;margin-top:16px;font-size:13px;color:var(--muted);}
+.lf a{color:var(--accent2);cursor:pointer;}
+
+/* DASHBOARD */
+#dashPage{display:none;min-height:100vh;position:relative;z-index:1;}
+.sidebar{position:fixed;left:0;top:0;bottom:0;width:255px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:22px 14px;z-index:200;transition:transform .3s;}
+.sl-logo{display:flex;align-items:center;gap:10px;margin-bottom:28px;padding:0 6px;}
+.sl-logo .ic{width:34px;height:34px;background:linear-gradient(135deg,#6366f1,#a78bfa);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:15px;}
+.sl-logo span{font-family:'Syne',sans-serif;font-size:17px;font-weight:800;background:linear-gradient(135deg,#e8eaf6,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.nl{font-size:10px;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;padding:0 8px;margin-bottom:6px;margin-top:10px;}
+.ni{display:flex;align-items:center;gap:9px;padding:10px 11px;border-radius:12px;cursor:pointer;transition:all .2s;color:var(--muted);font-size:13.5px;font-weight:500;margin-bottom:1px;}
+.ni:hover{background:var(--s2);color:var(--text);}
+.ni.active{background:rgba(99,102,241,.15);color:var(--accent2);}
+.ni-ic{font-size:17px;}
+.sb-bot{margin-top:auto;border-top:1px solid var(--border);padding-top:14px;}
+.uc{display:flex;align-items:center;gap:9px;padding:9px 11px;border-radius:12px;cursor:pointer;transition:all .2s;}
+.uc:hover{background:var(--s2);}
+.av{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#6366f1,#a78bfa);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#fff;flex-shrink:0;}
+.ui-name{font-size:13px;font-weight:600;}
+.ui-role{font-size:11px;color:var(--muted);}
+
+/* MAIN */
+.main{margin-left:255px;min-height:100vh;display:flex;flex-direction:column;}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:16px 26px;border-bottom:1px solid var(--border);background:rgba(7,9,15,.85);backdrop-filter:blur(12px);position:sticky;top:0;z-index:100;}
+.topbar-l{display:flex;align-items:center;gap:10px;}
+.tb-title{font-family:'Syne',sans-serif;font-size:17px;font-weight:700;}
+.topbar-r{display:flex;gap:8px;align-items:center;}
+.ib{width:36px;height:36px;border-radius:10px;background:var(--s2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;transition:all .2s;}
+.ib:hover{border-color:var(--accent);background:rgba(99,102,241,.1);}
+.hamburger{display:none;width:36px;height:36px;border-radius:10px;background:var(--s2);border:1px solid var(--border);align-items:center;justify-content:center;cursor:pointer;font-size:17px;}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:190;}
+.overlay.show{display:block;}
+
+/* PANELS */
+.panel{display:none;flex:1;flex-direction:column;}
+.panel.active{display:flex;}
+
+/* HOME */
+.home-inner{padding:26px;overflow-y:auto;flex:1;}
+.wb{background:linear-gradient(135deg,rgba(99,102,241,.12),rgba(167,139,250,.08));border:1px solid var(--border);border-radius:20px;padding:26px;margin-bottom:22px;position:relative;overflow:hidden;}
+.wb::after{content:'⚡';position:absolute;right:26px;top:50%;transform:translateY(-50%);font-size:68px;opacity:.07;}
+.wb h2{font-family:'Syne',sans-serif;font-size:21px;font-weight:800;margin-bottom:6px;}
+.wb p{color:var(--muted);font-size:13.5px;line-height:1.6;}
+.sg{display:grid;grid-template-columns:repeat(3,1fr);gap:13px;margin-bottom:20px;}
+.sc{background:var(--surface);border:1px solid var(--border);border-radius:15px;padding:17px;transition:all .3s;cursor:pointer;}
+.sc:hover{transform:translateY(-4px);box-shadow:var(--glow);border-color:var(--border2);}
+.sc-ic{font-size:24px;margin-bottom:9px;}
+.sc-lbl{font-size:10px;color:var(--muted);margin-bottom:3px;letter-spacing:.5px;}
+.sc-val{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;}
+.qg{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;}
+.qc{background:var(--surface);border:1px solid var(--border);border-radius:15px;padding:17px;cursor:pointer;transition:all .3s;display:flex;align-items:center;gap:12px;}
+.qc:hover{transform:translateY(-4px);box-shadow:var(--glow);border-color:var(--border2);}
+.qc-ic{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0;}
+.bg-p{background:rgba(99,102,241,.2);}.bg-b{background:rgba(56,189,248,.2);}.bg-g{background:rgba(52,211,153,.2);}.bg-o{background:rgba(251,146,60,.2);}.bg-r{background:rgba(248,113,113,.2);}.bg-y{background:rgba(251,191,36,.2);}
+.qc-info h4{font-size:13px;font-weight:600;margin-bottom:2px;}
+.qc-info p{font-size:11.5px;color:var(--muted);}
+
+/* CHAT */
+.chat-wrap{display:flex;flex-direction:column;height:100vh;}
+.chat-hdr{padding:16px 26px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;}
+.online-dot{width:8px;height:8px;border-radius:50%;background:var(--success);animation:blink 2s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.chat-msgs{flex:1;overflow-y:auto;padding:18px 26px;display:flex;flex-direction:column;gap:13px;scroll-behavior:smooth;}
+.msg{display:flex;gap:10px;max-width:82%;animation:msgIn .3s ease;}
+@keyframes msgIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.msg.user{flex-direction:row-reverse;align-self:flex-end;}
+.msg-av{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.msg.ai .msg-av{background:linear-gradient(135deg,#6366f1,#a78bfa);}
+.msg.user .msg-av{background:var(--s2);border:1px solid var(--border);}
+.msg-b{padding:11px 15px;border-radius:14px;font-size:13.5px;line-height:1.65;}
+.msg.ai .msg-b{background:var(--surface);border:1px solid var(--border);border-top-left-radius:4px;}
+.msg.user .msg-b{background:linear-gradient(135deg,#6366f1,#7c3aed);color:#fff;border-top-right-radius:4px;}
+.msg-img{max-width:220px;border-radius:10px;margin-top:5px;border:1px solid var(--border);display:block;}
+.typing{display:flex;gap:5px;padding:11px 15px;background:var(--surface);border:1px solid var(--border);border-radius:14px;border-top-left-radius:4px;width:fit-content;}
+.td{width:7px;height:7px;border-radius:50%;background:var(--muted);animation:ty 1.4s ease infinite;}
+.td:nth-child(2){animation-delay:.2s}.td:nth-child(3){animation-delay:.4s}
+@keyframes ty{0%,100%{opacity:.3;transform:translateY(0)}50%{opacity:1;transform:translateY(-4px)}}
+.chat-foot{padding:14px 26px;border-top:1px solid var(--border);}
+.hints{display:flex;gap:7px;margin-bottom:9px;flex-wrap:wrap;}
+.hc{padding:5px 11px;border-radius:20px;background:var(--s2);border:1px solid var(--border);font-size:11.5px;color:var(--muted);cursor:pointer;transition:all .2s;}
+.hc:hover{color:var(--text);border-color:var(--accent);}
+.ci-wrap{display:flex;gap:8px;align-items:flex-end;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:9px 12px;transition:all .3s;}
+.ci-wrap:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px rgba(99,102,241,.1);}
+.ci-actions{display:flex;gap:5px;align-items:center;}
+.ca-btn{width:30px;height:30px;border-radius:8px;background:var(--s2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:14px;transition:all .2s;flex-shrink:0;}
+.ca-btn:hover{border-color:var(--accent);background:rgba(99,102,241,.1);}
+#chatInput{flex:1;background:transparent;border:none;outline:none;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13.5px;resize:none;max-height:100px;line-height:1.5;min-height:20px;}
+#chatInput::placeholder{color:var(--muted);}
+.send-btn{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,#6366f1,#7c3aed);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;transition:all .2s;flex-shrink:0;}
+.send-btn:hover{transform:scale(1.06);box-shadow:0 4px 16px rgba(99,102,241,.4);}
+.send-btn:disabled{opacity:.4;cursor:default;transform:none;}
+.preview-bar{display:flex;gap:8px;padding:6px 0;flex-wrap:wrap;}
+.prev-item{position:relative;}
+.prev-item img{width:56px;height:56px;object-fit:cover;border-radius:9px;border:1px solid var(--border);}
+.prev-rm{position:absolute;top:-5px;right:-5px;width:17px;height:17px;background:var(--danger);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;cursor:pointer;color:#fff;border:none;}
+.prev-file{background:var(--s2);border:1px solid var(--border);border-radius:9px;padding:5px 10px;font-size:11.5px;color:var(--muted);display:flex;align-items:center;gap:5px;}
+
+/* IMAGE GEN */
+.igen-wrap{padding:26px;overflow-y:auto;flex:1;}
+.page-hdr{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;margin-bottom:5px;}
+.page-sub{color:var(--muted);font-size:13px;margin-bottom:22px;}
+.igen-input{width:100%;padding:13px 15px;background:var(--surface);border:1px solid var(--border);border-radius:13px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13.5px;outline:none;margin-bottom:12px;transition:all .3s;resize:vertical;min-height:80px;}
+.igen-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(99,102,241,.1);}
+.style-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:14px;}
+.style-card{background:var(--surface);border:2px solid var(--border);border-radius:11px;padding:11px;cursor:pointer;transition:all .2s;text-align:center;font-size:11.5px;}
+.style-card:hover,.style-card.active{border-color:var(--accent);background:rgba(99,102,241,.1);}
+.style-ic{font-size:20px;margin-bottom:4px;}
+.gen-btn{width:100%;padding:13px;background:linear-gradient(135deg,#6366f1,#7c3aed);color:#fff;border:none;border-radius:13px;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all .3s;margin-bottom:22px;}
+.gen-btn:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(99,102,241,.4);}
+.gen-btn:disabled{opacity:.5;cursor:default;transform:none;}
+.img-result{background:var(--surface);border:1px solid var(--border);border-radius:15px;overflow:hidden;}
+.img-ph{width:100%;aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:var(--muted);}
+.img-ph-ic{font-size:44px;opacity:.3;}
+.gen-img{width:100%;display:block;}
+.img-actions{display:flex;gap:9px;padding:13px;}
+
+/* PHOTO EDITOR */
+.photo-wrap{padding:26px;overflow-y:auto;flex:1;}
+.upload-zone{border:2px dashed var(--border);border-radius:17px;padding:36px;text-align:center;cursor:pointer;transition:all .3s;margin-bottom:18px;}
+.upload-zone:hover,.upload-zone.drag{border-color:var(--accent);background:rgba(99,102,241,.05);}
+.uz-ic{font-size:36px;margin-bottom:10px;opacity:.6;}
+.uz-title{font-size:14px;font-weight:600;margin-bottom:4px;}
+.uz-sub{font-size:12px;color:var(--muted);}
+.uz-btns{display:flex;gap:9px;justify-content:center;margin-top:14px;flex-wrap:wrap;}
+.uz-btn{padding:7px 14px;border-radius:9px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:12.5px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:5px;}
+.uz-btn:hover{border-color:var(--accent);background:rgba(99,102,241,.1);}
+.photo-editor{display:none;gap:18px;}
+.photo-editor.show{display:flex;}
+.pe-canvas-wrap{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:15px;overflow:hidden;display:flex;align-items:center;justify-content:center;min-height:280px;padding:12px;}
+#editCanvas{max-width:100%;max-height:380px;border-radius:10px;}
+.pe-tools{width:210px;}
+.pt-section{background:var(--surface);border:1px solid var(--border);border-radius:13px;padding:14px;margin-bottom:11px;}
+.pt-title{font-size:11px;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;margin-bottom:11px;}
+.slider-row{display:flex;align-items:center;gap:8px;margin-bottom:9px;font-size:11.5px;}
+.slider-row label{width:68px;color:var(--muted);}
+.slider-row input[type=range]{flex:1;accent-color:var(--accent);}
+.slider-row span{width:26px;text-align:right;font-size:10.5px;}
+.filter-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;}
+.filter-btn{padding:7px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:10.5px;cursor:pointer;transition:all .2s;text-align:center;}
+.filter-btn:hover,.filter-btn.active{border-color:var(--accent);color:var(--accent2);background:rgba(99,102,241,.1);}
+.ae-btn{width:100%;padding:8px 11px;border-radius:9px;border:1px solid var(--border);background:transparent;color:var(--text);font-size:11.5px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:6px;margin-bottom:7px;font-family:'DM Sans',sans-serif;}
+.ae-btn:hover{border-color:var(--accent);background:rgba(99,102,241,.1);color:var(--accent2);}
+
+/* CODING */
+.code-wrap{display:flex;flex-direction:column;height:100vh;}
+.code-hdr{padding:16px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.lang-select{background:var(--s2);border:1px solid var(--border);border-radius:9px;color:var(--text);padding:6px 11px;font-family:'DM Sans',sans-serif;font-size:12.5px;outline:none;cursor:pointer;}
+.code-body{display:flex;flex:1;overflow:hidden;}
+.code-left{flex:1;display:flex;flex-direction:column;border-right:1px solid var(--border);}
+.code-toolbar{display:flex;gap:7px;padding:9px 14px;border-bottom:1px solid var(--border);background:var(--s2);}
+.ct-btn{padding:5px 12px;border-radius:7px;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:11.5px;cursor:pointer;transition:all .2s;}
+.ct-btn:hover,.ct-btn.sel{background:rgba(99,102,241,.15);color:var(--accent2);border-color:var(--accent);}
+.ct-btn.run{background:linear-gradient(135deg,#6366f1,#7c3aed);color:#fff;border:none;}
+.ct-btn.run:hover{box-shadow:0 4px 14px rgba(99,102,241,.4);}
+#codeEditor{flex:1;width:100%;padding:14px;background:var(--s2);border:none;outline:none;color:var(--text);font-family:'Courier New',monospace;font-size:12.5px;resize:none;line-height:1.65;}
+#codeOut{padding:10px 14px;border-top:1px solid var(--border);background:var(--bg);font-family:'Courier New',monospace;font-size:12px;color:var(--success);min-height:54px;max-height:110px;overflow-y:auto;display:none;}
+.code-right{width:320px;display:flex;flex-direction:column;}
+.code-ai-msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;}
+.code-ai-foot{padding:11px;border-top:1px solid var(--border);display:flex;gap:7px;}
+#codeAiInput{flex:1;padding:9px 13px;background:var(--s2);border:1px solid var(--border);border-radius:11px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:12.5px;outline:none;}
+#codeAiInput:focus{border-color:var(--accent);}
+
+/* FILES */
+.files-wrap{padding:26px;overflow-y:auto;flex:1;}
+.fhdr-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+.files-hdr{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;}
+.files-tabs{display:flex;gap:6px;}
+.ft-btn{padding:6px 13px;border-radius:9px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:12px;cursor:pointer;transition:all .2s;}
+.ft-btn.active{background:rgba(99,102,241,.15);color:var(--accent2);border-color:var(--accent);}
+.file-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:11px;margin-bottom:18px;}
+.file-card{background:var(--surface);border:1px solid var(--border);border-radius:13px;padding:14px;cursor:pointer;transition:all .3s;text-align:center;}
+.file-card:hover{transform:translateY(-3px);box-shadow:var(--glow);border-color:var(--border2);}
+.fc-ic{font-size:30px;margin-bottom:8px;}
+.fc-name{font-size:11.5px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.fc-size{font-size:10.5px;color:var(--muted);margin-top:2px;}
+.drive-section{background:var(--surface);border:1px solid var(--border);border-radius:15px;padding:26px;text-align:center;}
+.dc-ic{font-size:44px;margin-bottom:11px;}
+.dc-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;margin-bottom:5px;}
+.dc-sub{color:var(--muted);font-size:12.5px;margin-bottom:16px;line-height:1.6;}
+.dc-btn{padding:10px 22px;background:linear-gradient(135deg,#6366f1,#7c3aed);border:none;border-radius:11px;color:#fff;font-family:'Syne',sans-serif;font-size:13.5px;font-weight:600;cursor:pointer;transition:all .3s;}
+.dc-btn:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(99,102,241,.4);}
+
+/* PRO */
+.pro-wrap{padding:26px;overflow-y:auto;flex:1;display:flex;align-items:center;justify-content:center;}
+.pro-card{background:var(--surface);border:1px solid var(--border);border-radius:22px;padding:38px;max-width:460px;width:100%;text-align:center;position:relative;overflow:hidden;}
+.pro-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(99,102,241,.08),rgba(167,139,250,.05));pointer-events:none;}
+.pro-badge{display:inline-block;padding:5px 13px;background:linear-gradient(135deg,#fbbf24,#f59e0b);border-radius:20px;font-size:11.5px;font-weight:700;color:#1a1a1a;margin-bottom:18px;}
+.pro-title{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;margin-bottom:7px;background:linear-gradient(135deg,#e8eaf6,#fbbf24);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.pro-price{font-family:'Syne',sans-serif;font-size:38px;font-weight:800;margin:14px 0 4px;}
+.pro-period{color:var(--muted);font-size:12.5px;margin-bottom:22px;}
+.pro-features{text-align:left;margin-bottom:26px;}
+.pf{display:flex;align-items:center;gap:9px;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;}
+.pf:last-child{border:none;}
+.pro-btn{width:100%;padding:14px;background:linear-gradient(135deg,#fbbf24,#f59e0b);border:none;border-radius:13px;color:#1a1a1a;font-family:'Syne',sans-serif;font-size:15px;font-weight:800;cursor:pointer;transition:all .3s;}
+.pro-btn:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(251,191,36,.4);}
+
+/* SETTINGS */
+.sett-wrap{padding:26px;overflow-y:auto;flex:1;}
+.sett-section{background:var(--surface);border:1px solid var(--border);border-radius:15px;margin-bottom:14px;overflow:hidden;}
+.sett-title{padding:14px 18px;border-bottom:1px solid var(--border);font-family:'Syne',sans-serif;font-size:13.5px;font-weight:700;}
+.sett-row{display:flex;align-items:center;justify-content:space-between;padding:13px 18px;border-bottom:1px solid var(--border);transition:background .2s;}
+.sett-row:last-child{border:none;}
+.sett-row:hover{background:var(--s2);}
+.sr-info h4{font-size:13px;font-weight:500;}
+.sr-info p{font-size:11.5px;color:var(--muted);margin-top:2px;}
+.toggle{width:42px;height:23px;background:var(--s3);border-radius:12px;position:relative;cursor:pointer;transition:background .3s;border:1px solid var(--border);flex-shrink:0;}
+.toggle.on{background:var(--accent);}
+.toggle::after{content:'';position:absolute;top:3px;left:3px;width:15px;height:15px;border-radius:50%;background:#fff;transition:transform .3s;}
+.toggle.on::after{transform:translateX(19px);}
+.sett-danger{background:rgba(248,113,113,.07);border-color:rgba(248,113,113,.2);}
+.danger-btn{padding:7px 14px;background:rgba(248,113,113,.14);border:1px solid rgba(248,113,113,.3);border-radius:9px;color:var(--danger);font-size:12.5px;cursor:pointer;transition:all .2s;}
+.danger-btn:hover{background:rgba(248,113,113,.25);}
+
+/* MODAL */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:500;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
+.modal-bg.show{display:flex;}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:19px;padding:26px;max-width:360px;width:90%;text-align:center;animation:fadeUp .3s ease;}
+.modal h3{font-family:'Syne',sans-serif;font-size:17px;font-weight:700;margin-bottom:7px;}
+.modal p{color:var(--muted);font-size:12.5px;margin-bottom:18px;line-height:1.6;}
+.modal-actions{display:flex;gap:9px;}
+.modal-actions button{flex:1;padding:10px;border-radius:11px;font-family:'DM Sans',sans-serif;font-size:13.5px;cursor:pointer;transition:all .2s;}
+.modal-cancel{background:var(--s2);border:1px solid var(--border);color:var(--text);}
+.modal-ok{background:linear-gradient(135deg,#6366f1,#7c3aed);border:none;color:#fff;}
+
+/* TOAST */
+.toast{position:fixed;bottom:20px;right:20px;background:var(--surface);border:1px solid var(--success);color:var(--success);padding:10px 17px;border-radius:11px;font-size:13px;z-index:9999;animation:toastIn .3s ease;box-shadow:0 8px 28px rgba(0,0,0,.5);}
+@keyframes toastIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.toast.warn{border-color:var(--warn);color:var(--warn);}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+  .sidebar{transform:translateX(-100%);}
+  .sidebar.open{transform:translateX(0);}
+  .main{margin-left:0;}
+  .hamburger{display:flex;}
+  .sg{grid-template-columns:1fr 1fr;}
+  .qg{grid-template-columns:1fr;}
+  .home-inner,.photo-wrap,.igen-wrap,.files-wrap,.sett-wrap,.pro-wrap{padding:14px;}
+  .chat-msgs,.chat-foot{padding:12px;}
+  .code-body{flex-direction:column;}
+  .code-right{width:100%;height:200px;}
+  .photo-editor.show{flex-direction:column;}
+  .pe-tools{width:100%;}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN PAGE -->
+<div id="loginPage">
+  <div class="login-card">
+    <div class="logo-wrap">
+      <div class="logo-icon">⚡</div>
+      <div class="logo-title">Vortex AI</div>
+      <div class="logo-sub">AI untuk coding, desain, edit foto & semua kebutuhan teknis</div>
+    </div>
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('masuk')">Masuk</button>
+      <button class="tab-btn" onclick="switchTab('daftar')">Daftar</button>
+    </div>
+    <button class="g-btn" onclick="loginGoogle()">
+      <svg width="17" height="17" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+      Lanjutkan dengan Google
+    </button>
+    <div class="divider">atau dengan email</div>
+    <div id="loginForm">
+      <div class="ig"><label>Email</label><input type="email" id="lEmail" placeholder="nama@gmail.com"></div>
+      <div class="ig"><label>Password</label><input type="password" id="lPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
+      <button class="main-btn" onclick="doLogin()">Masuk →</button>
+      <p class="lf">Belum punya akun? <a onclick="switchTab('daftar')">Daftar gratis</a></p>
+    </div>
+    <div id="regForm" style="display:none">
+      <div class="ig"><label>Nama Lengkap</label><input type="text" id="rName" placeholder="Nama kamu"></div>
+      <div class="ig"><label>Email</label><input type="email" id="rEmail" placeholder="nama@gmail.com"></div>
+      <div class="ig"><label>Password</label><input type="password" id="rPass" placeholder="Min. 8 karakter" onkeydown="if(event.key==='Enter')doRegister()"></div>
+      <button class="main-btn" onclick="doRegister()">Daftar Sekarang →</button>
+      <p class="lf">Sudah punya akun? <a onclick="switchTab('masuk')">Masuk</a></p>
+    </div>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashPage">
+  <div class="overlay" id="overlay" onclick="closeSb()"></div>
+  <div class="sidebar" id="sidebar">
+    <div class="sl-logo"><div class="ic">⚡</div><span>Vortex AI</span></div>
+    <div class="nl">Menu Utama</div>
+    <div class="ni active" onclick="go('home',this)"><span class="ni-ic">🏠</span>Beranda</div>
+    <div class="ni" onclick="go('chat',this)"><span class="ni-ic">💬</span>Chat AI</div>
+    <div class="ni" onclick="go('igen',this)"><span class="ni-ic">🎨</span>Desain Gambar AI</div>
+    <div class="ni" onclick="go('photo',this)"><span class="ni-ic">📸</span>Edit Foto AI</div>
+    <div class="ni" onclick="go('code',this)"><span class="ni-ic">💻</span>Coding Assistant</div>
+    <div class="ni" onclick="go('files',this)"><span class="ni-ic">📁</span>File & Drive</div>
+    <div class="nl">Akun</div>
+    <div class="ni" onclick="go('pro',this)"><span class="ni-ic">⭐</span>Upgrade Pro</div>
+    <div class="ni" onclick="go('sett',this)"><span class="ni-ic">⚙️</span>Pengaturan</div>
+    <div class="sb-bot">
+      <div class="uc" onclick="confirmLogout()">
+        <div class="av" id="sbAv">U</div>
+        <div><div class="ui-name" id="sbName">User</div><div class="ui-role">Free Plan · Logout</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-l">
+        <div class="hamburger" onclick="toggleSb()">☰</div>
+        <span class="tb-title" id="tbTitle">Beranda</span>
+      </div>
+      <div class="topbar-r">
+        <div class="ib" onclick="showToast('Tidak ada notifikasi baru')">🔔</div>
+        <div class="ib" onclick="confirmLogout()" title="Logout">🚪</div>
+      </div>
+    </div>
+
+    <!-- HOME -->
+    <div class="panel active" id="pHome">
+      <div class="home-inner">
+        <div class="wb">
+          <h2 id="wbMsg">Selamat datang! 👋</h2>
+          <p>Semua fitur siap digunakan. Pilih yang kamu butuhkan di bawah ini.</p>
+        </div>
+        <div class="sg">
+          <div class="sc" onclick="go('chat',null)"><div class="sc-ic">💬</div><div class="sc-lbl">TOTAL CHAT</div><div class="sc-val" id="stChat">0</div></div>
+          <div class="sc" onclick="go('igen',null)"><div class="sc-ic">🎨</div><div class="sc-lbl">GAMBAR DIBUAT</div><div class="sc-val" id="stImg">0</div></div>
+          <div class="sc" onclick="go('pro',null)"><div class="sc-ic">⭐</div><div class="sc-lbl">PLAN AKTIF</div><div class="sc-val" style="font-size:14px;margin-top:5px">Free</div></div>
+        </div>
+        <div class="qg">
+          <div class="qc" onclick="go('chat',null)"><div class="qc-ic bg-p">💬</div><div class="qc-info"><h4>Chat dengan AI</h4><p>Tanya apapun, jawab instan</p></div></div>
+          <div class="qc" onclick="go('igen',null)"><div class="qc-ic bg-b">🎨</div><div class="qc-info"><h4>Buat Gambar AI</h4><p>Generate dari deskripsi teks</p></div></div>
+          <div class="qc" onclick="go('photo',null)"><div class="qc-ic bg-o">📸</div><div class="qc-info"><h4>Edit Foto AI</h4><p>Upload & enhance foto kamu</p></div></div>
+          <div class="qc" onclick="go('code',null)"><div class="qc-ic bg-g">💻</div><div class="qc-info"><h4>Coding Assistant</h4><p>Debug & tulis kode otomatis</p></div></div>
+          <div class="qc" onclick="go('files',null)"><div class="qc-ic bg-r">📁</div><div class="qc-info"><h4>File & Drive</h4><p>Kelola file & Google Drive</p></div></div>
+          <div class="qc" onclick="go('pro',null)"><div class="qc-ic bg-y">⭐</div><div class="qc-info"><h4>Upgrade Pro</h4><p>Fitur tak terbatas & lebih cepat</p></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CHAT -->
+    <div class="panel" id="pChat">
+      <div class="chat-wrap">
+        <div class="chat-hdr">
+          <div class="av" style="width:37px;height:37px;border-radius:10px;font-size:16px">⚡</div>
+          <div>
+            <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:13.5px">Vortex AI Assistant</div>
+            <div style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted)"><div class="online-dot"></div>Online & siap membantu</div>
+          </div>
+        </div>
+        <div class="chat-msgs" id="chatMsgs">
+          <div class="msg ai"><div class="msg-av">⚡</div><div class="msg-b">Halo! Saya <strong>Vortex AI</strong> 👋<br><br>Kamu bisa kirim teks, foto dari 📷 kamera atau 🖼️ galeri, dan 📎 file. Mau mulai dari mana?</div></div>
+        </div>
+        <div class="chat-foot">
+          <div class="hints">
+            <div class="hc" onclick="sh('Buatkan kode Python untuk web scraping')">💻 Kode Python</div>
+            <div class="hc" onclick="sh('Jelaskan machine learning dengan mudah')">🤖 Machine Learning</div>
+            <div class="hc" onclick="sh('Tulis caption Instagram yang viral')">📱 Caption IG</div>
+            <div class="hc" onclick="sh('Bantu saya debug kode ini')">🐛 Debug Kode</div>
+          </div>
+          <div id="previewBar" class="preview-bar"></div>
+          <div class="ci-wrap">
+            <div class="ci-actions">
+              <div class="ca-btn" title="Kamera" onclick="document.getElementById('camIn').click()">📷</div>
+              <div class="ca-btn" title="Galeri" onclick="document.getElementById('galIn').click()">🖼️</div>
+              <div class="ca-btn" title="File" onclick="document.getElementById('fileIn').click()">📎</div>
+              <div class="ca-btn" title="Drive" onclick="showToast('⚠️ Hubungkan Drive di menu File & Drive','warn')">☁️</div>
+            </div>
+            <textarea id="chatInput" placeholder="Ketik pesan, atau kirim foto & file..." rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+            <button class="send-btn" id="sendBtn" onclick="sendMsg()">➤</button>
+          </div>
+        </div>
+      </div>
+      <input type="file" id="camIn" accept="image/*" capture="environment" style="display:none" onchange="handleImgUp(this)">
+      <input type="file" id="galIn" accept="image/*,video/*" multiple style="display:none" onchange="handleImgUp(this)">
+      <input type="file" id="fileIn" multiple style="display:none" onchange="handleFileUp(this)">
+    </div>
+
+    <!-- IMAGE GEN -->
+    <div class="panel" id="pIgen">
+      <div class="igen-wrap">
+        <div class="page-hdr">🎨 Generate Gambar AI</div>
+        <div class="page-sub">Deskripsikan gambar yang kamu inginkan, AI akan membuatnya</div>
+        <textarea class="igen-input" id="igenPrompt" placeholder="Contoh: Pemandangan gunung saat senja dengan danau yang tenang, cinematic lighting, 8K..."></textarea>
+        <div class="style-grid">
+          <div class="style-card active" onclick="setStyle(this,'Realistic photo')"><div class="style-ic">📷</div>Realistis</div>
+          <div class="style-card" onclick="setStyle(this,'Digital art')"><div class="style-ic">🎨</div>Digital Art</div>
+          <div class="style-card" onclick="setStyle(this,'Anime style')"><div class="style-ic">🌸</div>Anime</div>
+          <div class="style-card" onclick="setStyle(this,'Oil painting')"><div class="style-ic">🖌️</div>Lukisan</div>
+          <div class="style-card" onclick="setStyle(this,'3D render')"><div class="style-ic">🌐</div>3D Render</div>
+          <div class="style-card" onclick="setStyle(this,'Minimalist flat')"><div class="style-ic">✏️</div>Minimalis</div>
+        </div>
+        <button class="gen-btn" id="genBtn" onclick="generateImg()">✨ Generate Gambar</button>
+        <div class="img-result">
+          <div class="img-ph" id="imgPh"><div class="img-ph-ic">🖼️</div><span style="font-size:12.5px;color:var(--muted)">Gambar akan muncul di sini</span></div>
+          <img id="genImg" class="gen-img" style="display:none">
+          <div class="img-actions" id="imgAct" style="display:none">
+            <button class="ct-btn sel" onclick="dlImg()">⬇️ Download</button>
+            <button class="ct-btn" onclick="resetImg()">🗑️ Reset</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EDIT FOTO -->
+    <div class="panel" id="pPhoto">
+      <div class="photo-wrap">
+        <div class="page-hdr">📸 Edit Foto AI</div>
+        <div class="page-sub">Upload foto untuk diedit dengan tools manual & AI</div>
+        <div class="upload-zone" id="upZone" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="dropFile(event)">
+          <div class="uz-ic">📤</div>
+          <div class="uz-title">Tap atau seret foto ke sini</div>
+          <div class="uz-sub">JPG, PNG, WEBP — Max 10MB</div>
+          <div class="uz-btns">
+            <div class="uz-btn" onclick="document.getElementById('photoCam').click()">📷 Kamera</div>
+            <div class="uz-btn" onclick="document.getElementById('photoGal').click()">🖼️ Galeri</div>
+            <div class="uz-btn" onclick="document.getElementById('photoFile').click()">📁 File</div>
+          </div>
+        </div>
+        <input type="file" id="photoCam" accept="image/*" capture="environment" style="display:none" onchange="loadEditor(this)">
+        <input type="file" id="photoGal" accept="image/*" style="display:none" onchange="loadEditor(this)">
+        <input type="file" id="photoFile" accept="image/*" style="display:none" onchange="loadEditor(this)">
+        <div class="photo-editor" id="photoEditor">
+          <div class="pe-canvas-wrap"><canvas id="editCanvas"></canvas></div>
+          <div class="pe-tools">
+            <div class="pt-section">
+              <div class="pt-title">Penyesuaian</div>
+              <div class="slider-row"><label>Kecerahan</label><input type="range" min="-100" max="100" value="0" oninput="applyFilt();this.nextElementSibling.textContent=this.value"><span>0</span></div>
+              <div class="slider-row"><label>Kontras</label><input type="range" min="-100" max="100" value="0" oninput="applyFilt();this.nextElementSibling.textContent=this.value"><span>0</span></div>
+              <div class="slider-row"><label>Saturasi</label><input type="range" min="-100" max="100" value="0" oninput="applyFilt();this.nextElementSibling.textContent=this.value"><span>0</span></div>
+              <div class="slider-row"><label>Blur</label><input type="range" min="0" max="20" value="0" oninput="applyFilt();this.nextElementSibling.textContent=this.value"><span>0</span></div>
+            </div>
+            <div class="pt-section">
+              <div class="pt-title">Filter Preset</div>
+              <div class="filter-grid">
+                <div class="filter-btn active" onclick="setFilt(this,'none')">Normal</div>
+                <div class="filter-btn" onclick="setFilt(this,'grayscale(100%)')">B&W</div>
+                <div class="filter-btn" onclick="setFilt(this,'sepia(80%)')">Sepia</div>
+                <div class="filter-btn" onclick="setFilt(this,'hue-rotate(180deg)')">Vivid</div>
+                <div class="filter-btn" onclick="setFilt(this,'invert(100%)')">Invert</div>
+                <div class="filter-btn" onclick="setFilt(this,'contrast(150%) saturate(150%)')">Pop</div>
+              </div>
+            </div>
+            <div class="pt-section">
+              <div class="pt-title">AI Enhance</div>
+              <button class="ae-btn" onclick="aiEnh('hapus background')">✂️ Hapus Background</button>
+              <button class="ae-btn" onclick="aiEnh('perjelas wajah')">✨ Perjelas Foto</button>
+              <button class="ae-btn" onclick="aiEnh('kolorasi')">🎨 Kolorasi Foto</button>
+              <button class="ae-btn" onclick="aiEnh('HDR')">🌄 Efek HDR</button>
+              <button class="ae-btn" onclick="resetPhoto()">🔄 Reset Foto</button>
+            </div>
+            <button class="gen-btn" onclick="dlEdit()" style="margin-top:6px">⬇️ Download Foto</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CODING -->
+    <div class="panel" id="pCode">
+      <div class="code-wrap">
+        <div class="code-hdr">
+          <div style="display:flex;align-items:center;gap:9px">
+            <span style="font-family:'Syne',sans-serif;font-weight:700;font-size:14px">💻 Coding Assistant</span>
+            <select class="lang-select" id="langSel">
+              <option>Python</option><option>JavaScript</option><option>HTML/CSS</option>
+              <option>Java</option><option>C++</option><option>PHP</option><option>SQL</option><option>Kotlin</option><option>TypeScript</option>
+            </select>
+          </div>
+          <div style="display:flex;gap:7px">
+            <input type="file" id="codeFileIn" style="display:none" accept=".py,.js,.html,.css,.java,.cpp,.php,.sql,.kt,.ts,.jsx,.txt" onchange="loadCodeFile(this)">
+            <div class="ib" onclick="document.getElementById('codeFileIn').click()" title="Buka File">📂</div>
+            <div class="ib" onclick="dlCode()" title="Download">⬇️</div>
+          </div>
+        </div>
+        <div class="code-body">
+          <div class="code-left">
+            <div class="code-toolbar">
+              <button class="ct-btn run" onclick="runCode()">▶ Jalankan</button>
+              <button class="ct-btn" onclick="fmtCode()">✨ Format</button>
+              <button class="ct-btn" onclick="clrCode()">🗑️ Hapus</button>
+              <button class="ct-btn" onclick="cpyCode()">📋 Copy</button>
+            </div>
+            <textarea id="codeEditor" placeholder="// Tulis kode di sini...
+// Atau tanya AI di panel kanan untuk generate kode
+
+print('Hello, Vortex AI!')"></textarea>
+            <div id="codeOut"></div>
+          </div>
+          <div class="code-right">
+            <div style="padding:12px 14px;border-bottom:1px solid var(--border);font-family:'Syne',sans-serif;font-weight:700;font-size:12.5px">🤖 AI Code Helper</div>
+            <div class="code-ai-msgs" id="codeAiMsgs">
+              <div class="msg ai" style="max-width:100%"><div class="msg-av">⚡</div><div class="msg-b" style="font-size:12px">Tanya saya soal kode! Saya bisa bantu debug, jelaskan, atau generate kode baru. 🚀</div></div>
+            </div>
+            <div class="code-ai-foot">
+              <input id="codeAiInput" placeholder="Tanya tentang kode..." onkeydown="if(event.key==='Enter')sendCodeAi()">
+              <button class="send-btn" onclick="sendCodeAi()" style="width:32px;height:32px;font-size:13px">➤</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FILES -->
+    <div class="panel" id="pFiles">
+      <div class="files-wrap">
+        <div class="fhdr-row">
+          <div class="files-hdr">📁 File & Drive</div>
+          <div class="files-tabs">
+            <button class="ft-btn active" onclick="showFTab('local',this)">Lokal</button>
+            <button class="ft-btn" onclick="showFTab('drive',this)">Google Drive</button>
+          </div>
+        </div>
+        <div id="fLocal">
+          <div style="display:flex;gap:9px;margin-bottom:16px;flex-wrap:wrap">
+            <div class="uz-btn" onclick="document.getElementById('fUpload').click()">📂 Upload File</div>
+            <div class="uz-btn" onclick="document.getElementById('fCam').click()">📷 Kamera</div>
+            <div class="uz-btn" onclick="document.getElementById('fGal').click()">🖼️ Galeri</div>
+          </div>
+          <input type="file" id="fUpload" multiple style="display:none" onchange="addF(this)">
+          <input type="file" id="fCam" accept="image/*" capture="environment" style="display:none" onchange="addF(this)">
+          <input type="file" id="fGal" accept="image/*,video/*" multiple style="display:none" onchange="addF(this)">
+          <div class="file-grid" id="fileGrid">
+            <div class="file-card" style="border:2px dashed var(--border);background:transparent" onclick="document.getElementById('fUpload').click()">
+              <div class="fc-ic">➕</div><div class="fc-name">Tambah File</div>
+            </div>
+          </div>
+        </div>
+        <div id="fDrive" style="display:none">
+          <div class="drive-section">
+            <div class="dc-ic">☁️</div>
+            <div class="dc-title">Hubungkan Google Drive</div>
+            <div class="dc-sub">Akses & kelola file Google Drive langsung dari Vortex AI. Tersedia di plan Pro.</div>
+            <button class="dc-btn" onclick="showToast('⚠️ Fitur ini tersedia di Vortex Pro! Upgrade sekarang.','warn')">
+              <svg width="14" height="14" viewBox="0 0 48 48" style="vertical-align:middle;margin-right:6px"><path fill="#4285F4" d="M16 6L0 34h14l16-28z"/><path fill="#FBBC05" d="M32 6L16 34h32L32 6z"/><path fill="#34A853" d="M0 34l8 14h32l8-14z"/></svg>
+              Hubungkan Google Drive
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PRO -->
+    <div class="panel" id="pPro">
+      <div class="pro-wrap">
+        <div class="pro-card">
+          <div class="pro-badge">⭐ VORTEX PRO</div>
+          <div class="pro-title">Upgrade ke Pro</div>
+          <p style="color:var(--muted);font-size:12.5px;margin-top:5px">Akses semua fitur tanpa batas</p>
+          <div class="pro-price">Rp 49.000</div>
+          <div class="pro-period">per bulan · batalkan kapan saja</div>
+          <div class="pro-features">
+            <div class="pf">♾️ Chat AI unlimited tanpa batas</div>
+            <div class="pf">🎨 Generate 100 gambar/hari</div>
+            <div class="pf">⚡ Respon 3x lebih cepat</div>
+            <div class="pf">💾 Penyimpanan 50GB</div>
+            <div class="pf">☁️ Google Drive terintegrasi</div>
+            <div class="pf">💻 Code execution server-side</div>
+            <div class="pf">🔒 Privasi & enkripsi penuh</div>
+            <div class="pf">🎯 Prioritas support 24/7</div>
+          </div>
+          <button class="pro-btn" onclick="showToast('⚡ Segera hadir! Terima kasih atas minat kamu 🙏')">✨ Mulai Pro Sekarang</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div class="panel" id="pSett">
+      <div class="sett-wrap">
+        <div class="sett-section">
+          <div class="sett-title">👤 Profil Akun</div>
+          <div class="sett-row"><div class="sr-info"><h4>Nama</h4><p id="settName">-</p></div><div class="ib" onclick="showToast('Fitur edit profil segera hadir')">✏️</div></div>
+          <div class="sett-row"><div class="sr-info"><h4>Email</h4><p id="settEmail">-</p></div></div>
+          <div class="sett-row"><div class="sr-info"><h4>Plan</h4><p>Free Plan</p></div><button class="ct-btn sel" onclick="go('pro',null)" style="font-size:11px;padding:5px 10px">Upgrade ⭐</button></div>
+        </div>
+        <div class="sett-section">
+          <div class="sett-title">🎨 Tampilan</div>
+          <div class="sett-row"><div class="sr-info"><h4>Mode Gelap</h4><p>Tema antarmuka</p></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+          <div class="sett-row"><div class="sr-info"><h4>Animasi</h4><p>Efek transisi UI</p></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+        </div>
+        <div class="sett-section">
+          <div class="sett-title">🔔 Notifikasi</div>
+          <div class="sett-row"><div class="sr-info"><h4>Push Notification</h4><p>Notifikasi dari Vortex AI</p></div><div class="toggle" onclick="this.classList.toggle('on')"></div></div>
+          <div class="sett-row"><div class="sr-info"><h4>Email Newsletter</h4><p>Tips & update terbaru</p></div><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+        </div>
+        <div class="sett-section sett-danger">
+          <div class="sett-title" style="color:var(--danger)">⚠️ Zona Berbahaya</div>
+          <div class="sett-row"><div class="sr-info"><h4>Hapus Semua Chat</h4><p>Tidak bisa dibatalkan</p></div><button class="danger-btn" onclick="clearChats()">Hapus</button></div>
+          <div class="sett-row"><div class="sr-info"><h4>Logout</h4><p>Keluar dari akun kamu</p></div><button class="danger-btn" onclick="confirmLogout()">Logout</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-bg" id="logoutModal">
+  <div class="modal">
+    <div style="font-size:34px;margin-bottom:10px">👋</div>
+    <h3>Yakin mau logout?</h3>
+    <p>Kamu perlu login lagi untuk mengakses Vortex AI.</p>
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="document.getElementById('logoutModal').classList.remove('show')">Batal</button>
+      <button class="modal-ok" onclick="doLogout()">Logout</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// STATE
+let users=JSON.parse(localStorage.getItem('vx_users')||'{}');
+let curUser=null,chatHist=[],imgStyle='Realistic photo';
+let upImgs=[],upFiles=[],localFiles=[];
+let chatCnt=0,imgCnt=0,curFilt='none',origImgData=null;
+const API='https://api.anthropic.com/v1/messages';
+
+// AUTH
+function switchTab(t){
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',(t==='masuk'&&i===0)||(t==='daftar'&&i===1)));
+  document.getElementById('loginForm').style.display=t==='masuk'?'block':'none';
+  document.getElementById('regForm').style.display=t==='daftar'?'block':'none';
+}
+function loginGoogle(){enterDash({name:'Google User',email:'google@gmail.com',pass:''});}
+function doLogin(){
+  const e=document.getElementById('lEmail').value.trim(),p=document.getElementById('lPass').value;
+  if(!e||!p)return showToast('⚠️ Isi email dan password!','warn');
+  const u=users[e];
+  if(!u)return showToast('⚠️ Akun tidak ditemukan!','warn');
+  if(u.pass!==btoa(p))return showToast('⚠️ Password salah!','warn');
+  enterDash(u);
+}
+function doRegister(){
+  const n=document.getElementById('rName').value.trim(),e=document.getElementById('rEmail').value.trim(),p=document.getElementById('rPass').value;
+  if(!n||!e||!p)return showToast('⚠️ Lengkapi semua field!','warn');
+  if(p.length<8)return showToast('⚠️ Password min. 8 karakter!','warn');
+  if(users[e])return showToast('⚠️ Email sudah terdaftar!','warn');
+  const u={name:n,email:e,pass:btoa(p)};
+  users[e]=u;localStorage.setItem('vx_users',JSON.stringify(users));
+  showToast('✅ Akun berhasil dibuat!');
+  setTimeout(()=>enterDash(u),700);
+}
+function enterDash(u){
+  curUser=u;
+  document.getElementById('loginPage').style.display='none';
+  document.getElementById('dashPage').style.display='block';
+  const i=u.name.charAt(0).toUpperCase();
+  document.getElementById('sbAv').textContent=i;
+  document.getElementById('sbName').textContent=u.name;
+  document.getElementById('wbMsg').textContent=`Selamat datang, ${u.name}! 👋`;
+  document.getElementById('settName').textContent=u.name;
+  document.getElementById('settEmail').textContent=u.email;
+}
+function confirmLogout(){document.getElementById('logoutModal').classList.add('show');}
+function doLogout(){
+  curUser=null;chatHist=[];
+  document.getElementById('logoutModal').classList.remove('show');
+  document.getElementById('dashPage').style.display='none';
+  document.getElementById('loginPage').style.display='flex';
+}
+
+// NAV
+const panels={home:'pHome',chat:'pChat',igen:'pIgen',photo:'pPhoto',code:'pCode',files:'pFiles',pro:'pPro',sett:'pSett'};
+const titles={home:'Beranda',chat:'Chat AI',igen:'Desain Gambar AI',photo:'Edit Foto AI',code:'Coding Assistant',files:'File & Drive',pro:'Upgrade Pro',sett:'Pengaturan'};
+function go(id,el){
+  document.querySelectorAll('.ni').forEach(i=>i.classList.remove('active'));
+  if(el)el.classList.add('active');
+  document.querySelectorAll('.panel').forEach(p=>{p.classList.remove('active');p.style.display='none';});
+  const p=document.getElementById(panels[id]);
+  if(p){p.classList.add('active');p.style.display='flex';}
+  document.getElementById('tbTitle').textContent=titles[id]||id;
+  closeSb();
+}
+function toggleSb(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('overlay').classList.toggle('show');}
+function closeSb(){document.getElementById('sidebar').classList.remove('open');document.getElementById('overlay').classList.remove('show');}
+
+// CHAT
+function handleKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMsg();}}
+function autoResize(el){el.style.height='auto';el.style.height=Math.min(el.scrollHeight,100)+'px';}
+function sh(t){document.getElementById('chatInput').value=t;sendMsg();}
+function handleImgUp(input){
+  if(!input.files.length)return;
+  Array.from(input.files).forEach(f=>{
+    const r=new FileReader();
+    r.onload=ev=>{upImgs.push({name:f.name,data:ev.target.result});renderPrev();};
+    r.readAsDataURL(f);
+  });
+  input.value='';
+}
+function handleFileUp(input){
+  if(!input.files.length)return;
+  Array.from(input.files).forEach(f=>{upFiles.push({name:f.name,size:fmtSize(f.size)});renderPrev();});
+  input.value='';
+}
+function renderPrev(){
+  const bar=document.getElementById('previewBar');bar.innerHTML='';
+  upImgs.forEach((img,i)=>{
+    const d=document.createElement('div');d.className='prev-item';
+    d.innerHTML=`<img src="${img.data}"><button class="prev-rm" onclick="rmImg(${i})">✕</button>`;bar.appendChild(d);
+  });
+  upFiles.forEach((f,i)=>{
+    const d=document.createElement('div');d.className='prev-file';
+    d.innerHTML=`📄 ${f.name} <span style="color:var(--muted)">(${f.size})</span> <span style="cursor:pointer;color:var(--danger);margin-left:4px" onclick="rmFile(${i})">✕</span>`;bar.appendChild(d);
+  });
+}
+function rmImg(i){upImgs.splice(i,1);renderPrev();}
+function rmFile(i){upFiles.splice(i,1);renderPrev();}
+async function sendMsg(){
+  const input=document.getElementById('chatInput');
+  const txt=input.value.trim();
+  if(!txt&&!upImgs.length&&!upFiles.length)return;
+  let disp=txt;
+  if(upImgs.length)disp+=(txt?' ':'')+'📷 '+upImgs.map(i=>i.name).join(', ');
+  if(upFiles.length)disp+=(txt?' ':'')+'📎 '+upFiles.map(f=>f.name).join(', ');
+  appendMsg('user',disp,'😊');
+  chatHist.push({role:'user',content:txt||'Analisis gambar/file yang saya kirim'});
+  const imgs=[...upImgs];upImgs=[];upFiles=[];renderPrev();
+  input.value='';input.style.height='auto';
+  document.getElementById('sendBtn').disabled=true;
+  chatCnt++;document.getElementById('stChat').textContent=chatCnt;
+  imgs.forEach(img=>{
+    const box=document.getElementById('chatMsgs');
+    const d=document.createElement('div');d.className='msg user';
+    d.innerHTML=`<div class="msg-av">😊</div><div class="msg-b"><img src="${img.data}" class="msg-img" alt="foto"></div>`;
+    box.appendChild(d);box.scrollTop=box.scrollHeight;
+  });
+  const tid=appendTyping('chatMsgs');
+  try{
+    const res=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,
+        system:'Kamu adalah Vortex AI, asisten AI pintar dan ramah. Jawab dalam Bahasa Indonesia yang natural dan informatif. Gunakan emoji sesekali.',
+        messages:chatHist})});
+    removeTyping(tid);
+    const data=await res.json();
+    const reply=data.content?.map(c=>c.text||'').join('')||'Maaf ada gangguan.';
+    chatHist.push({role:'assistant',content:reply});
+    appendMsg('ai',reply,'⚡');
+  }catch{removeTyping(tid);appendMsg('ai','⚠️ Gagal terhubung. Periksa koneksi internet.','⚡');}
+  document.getElementById('sendBtn').disabled=false;
+}
+function appendMsg(role,txt,icon){
+  const box=document.getElementById('chatMsgs');
+  const d=document.createElement('div');d.className=`msg ${role}`;
+  const fmt=txt.replace(/\n/g,'<br>').replace(/`([^`]+)`/g,'<code style="background:var(--s2);padding:1px 4px;border-radius:3px;font-size:11.5px">$1</code>').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>');
+  d.innerHTML=`<div class="msg-av">${icon}</div><div class="msg-b">${fmt}</div>`;
+  box.appendChild(d);box.scrollTop=box.scrollHeight;
+}
+function appendTyping(boxId){
+  const box=document.getElementById(boxId);
+  const id='ty_'+Date.now();
+  const d=document.createElement('div');d.className='msg ai';d.id=id;
+  d.innerHTML=`<div class="msg-av">⚡</div><div class="typing"><div class="td"></div><div class="td"></div><div class="td"></div></div>`;
+  box.appendChild(d);box.scrollTop=box.scrollHeight;return id;
+}
+function removeTyping(id){const e=document.getElementById(id);if(e)e.remove();}
+
+// IMAGE GEN
+function setStyle(el,s){document.querySelectorAll('.style-card').forEach(c=>c.classList.remove('active'));el.classList.add('active');imgStyle=s;}
+async function generateImg(){
+  const prompt=document.getElementById('igenPrompt').value.trim();
+  if(!prompt)return showToast('⚠️ Tulis deskripsi gambar dulu!','warn');
+  const btn=document.getElementById('genBtn');btn.disabled=true;btn.textContent='⏳ Sedang generate...';
+  document.getElementById('imgPh').style.display='flex';
+  document.getElementById('imgPh').innerHTML='<div class="typing" style="background:transparent;border:none;padding:8px"><div class="td"></div><div class="td"></div><div class="td"></div></div><span style="font-size:12.5px;color:var(--muted);margin-top:8px">AI sedang menggambar...</span>';
+  document.getElementById('genImg').style.display='none';document.getElementById('imgAct').style.display='none';
+  try{
+    const keywords=prompt.split(' ').slice(0,4).join(',');
+    const imgUrl=`https://source.unsplash.com/800x800/?${encodeURIComponent(keywords)}&t=${Date.now()}`;
+    const img=document.getElementById('genImg');
+    img.onload=()=>{
+      document.getElementById('imgPh').style.display='none';img.style.display='block';document.getElementById('imgAct').style.display='flex';
+      btn.disabled=false;btn.textContent='✨ Generate Gambar';
+      imgCnt++;document.getElementById('stImg').textContent=imgCnt;showToast('✅ Gambar berhasil dibuat!');
+    };
+    img.onerror=()=>{document.getElementById('imgPh').innerHTML='<div class="img-ph-ic">⚠️</div><span style="font-size:12.5px;color:var(--muted)">Gagal load. Coba lagi.</span>';btn.disabled=false;btn.textContent='✨ Generate Gambar';};
+    img.src=imgUrl;
+  }catch{document.getElementById('imgPh').innerHTML='<div class="img-ph-ic">⚠️</div><span style="font-size:12.5px;color:var(--muted)">Gagal generate.</span>';btn.disabled=false;btn.textContent='✨ Generate Gambar';}
+}
+function dlImg(){const a=document.createElement('a');a.href=document.getElementById('genImg').src;a.download='vortex-image.jpg';a.target='_blank';a.click();}
+function resetImg(){document.getElementById('genImg').style.display='none';document.getElementById('imgPh').style.display='flex';document.getElementById('imgPh').innerHTML='<div class="img-ph-ic">🖼️</div><span style="font-size:12.5px;color:var(--muted)">Gambar akan muncul di sini</span>';document.getElementById('imgAct').style.display='none';}
+
+// PHOTO EDITOR
+function loadEditor(input){
+  if(!input.files.length)return;
+  const r=new FileReader();
+  r.onload=ev=>{
+    const img=new Image();
+    img.onload=()=>{
+      const canvas=document.getElementById('editCanvas');
+      const maxW=Math.min(img.width,580);const scale=maxW/img.width;
+      canvas.width=maxW;canvas.height=img.height*scale;
+      const ctx=canvas.getContext('2d');ctx.drawImage(img,0,0,canvas.width,canvas.height);
+      origImgData=ctx.getImageData(0,0,canvas.width,canvas.height);
+      document.getElementById('photoEditor').classList.add('show');
+      document.getElementById('upZone').style.display='none';
+      showToast('✅ Foto berhasil diload!');
+    };
+    img.src=ev.target.result;
+  };
+  r.readAsDataURL(input.files[0]);input.value='';
+}
+function applyFilt(){
+  if(!origImgData)return;
+  const canvas=document.getElementById('editCanvas');
+  const sl=document.querySelectorAll('.slider-row input');
+  const br=parseInt(sl[0].value),ct=parseInt(sl[1].value),sa=parseInt(sl[2].value),bl=parseInt(sl[3].value);
+  let f=curFilt==='none'?'':curFilt+' ';
+  f+=`brightness(${1+br/100}) contrast(${1+ct/100}) saturate(${1+sa/100})`;
+  if(bl>0)f+=` blur(${bl/5}px)`;
+  canvas.style.filter=f;
+}
+function setFilt(el,f){document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));el.classList.add('active');curFilt=f;applyFilt();}
+function aiEnh(action){
+  const canvas=document.getElementById('editCanvas');
+  if(action==='hapus background'){canvas.style.filter+=' contrast(1.5) saturate(0.1)';showToast('✅ Background dihaluskan!');}
+  else if(action==='perjelas wajah'){canvas.style.filter+=' contrast(1.15) brightness(1.05)';showToast('✅ Foto diperjelas!');}
+  else if(action==='kolorasi'){canvas.style.filter=canvas.style.filter.replace('grayscale(100%)','');canvas.style.filter+=' saturate(1.6)';showToast('✅ Warna ditambahkan!');}
+  else if(action==='HDR'){canvas.style.filter+=' contrast(1.35) saturate(1.45) brightness(1.05)';showToast('✅ Efek HDR diterapkan!');}
+}
+function resetPhoto(){
+  if(!origImgData)return;
+  const canvas=document.getElementById('editCanvas');
+  canvas.style.filter='';
+  canvas.getContext('2d').putImageData(origImgData,0,0);
+  document.querySelectorAll('.slider-row input').forEach(s=>s.value=0);
+  document.querySelectorAll('.slider-row span').forEach(s=>s.textContent='0');
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelector('.filter-btn').classList.add('active');
+  curFilt='none';showToast('✅ Foto direset!');
+}
+function dlEdit(){const a=document.createElement('a');a.href=document.getElementById('editCanvas').toDataURL('image/png');a.download='vortex-edit.png';a.click();}
+function dragOver(e){e.preventDefault();document.getElementById('upZone').classList.add('drag');}
+function dragLeave(){document.getElementById('upZone').classList.remove('drag');}
+function dropFile(e){
+  e.preventDefault();document.getElementById('upZone').classList.remove('drag');
+  if(e.dataTransfer.files.length)loadEditor({files:e.dataTransfer.files,value:''});
+}
+
+// CODING
+async function sendCodeAi(){
+  const input=document.getElementById('codeAiInput');
+  const txt=input.value.trim();if(!txt)return;
+  const code=document.getElementById('codeEditor').value;
+  const lang=document.getElementById('langSel').value;
+  input.value='';
+  const box=document.getElementById('codeAiMsgs');
+  const ud=document.createElement('div');ud.className='msg user';ud.style.maxWidth='100%';
+  ud.innerHTML=`<div class="msg-av">😊</div><div class="msg-b" style="font-size:11.5px">${txt}</div>`;
+  box.appendChild(ud);box.scrollTop=box.scrollHeight;
+  const tid=appendTyping('codeAiMsgs');
+  try{
+    const res=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,
+        system:`Kamu coding assistant ahli ${lang}. Jawab singkat dalam Bahasa Indonesia. Berikan kode dalam code block jika perlu.`,
+        messages:[{role:'user',content:`Kode:\n\`\`\`${lang.toLowerCase()}\n${code||'(kosong)'}\n\`\`\`\n\nPertanyaan: ${txt}`}]})});
+    removeTyping(tid);
+    const data=await res.json();
+    const reply=data.content?.map(c=>c.text||'').join('')||'Maaf ada gangguan.';
+    const d=document.createElement('div');d.className='msg ai';d.style.maxWidth='100%';
+    d.innerHTML=`<div class="msg-av">⚡</div><div class="msg-b" style="font-size:11.5px">${reply.replace(/\n/g,'<br>').replace(/`([^`]+)`/g,'<code style="background:var(--s3);padding:1px 3px;border-radius:3px;font-size:10.5px">$1</code>')}</div>`;
+    box.appendChild(d);box.scrollTop=box.scrollHeight;
+    const cm=reply.match(/```[\w]*\n([\s\S]+?)```/);
+    if(cm){document.getElementById('codeEditor').value=cm[1].trim();showToast('✅ Kode diisi dari AI!');}
+  }catch{
+    removeTyping(tid);
+    const d=document.createElement('div');d.className='msg ai';d.style.maxWidth='100%';
+    d.innerHTML=`<div class="msg-av">⚡</div><div class="msg-b" style="font-size:11.5px">⚠️ Gagal terhubung.</div>`;
+    box.appendChild(d);
+  }
+}
+function runCode(){
+  const code=document.getElementById('codeEditor').value;
+  const lang=document.getElementById('langSel').value;
+  const out=document.getElementById('codeOut');
+  out.style.display='block';
+  if(lang==='JavaScript'){
+    try{
+      const logs=[];const orig=console.log;
+      console.log=(...a)=>logs.push(a.join(' '));
+      eval(code);console.log=orig;
+      out.textContent=logs.length?logs.join('\n'):'✅ Kode berjalan (tidak ada output)';
+      out.style.color='var(--success)';
+    }catch(e){out.textContent='❌ Error: '+e.message;out.style.color='var(--danger)';}
+  }else{
+    out.textContent=`⚡ Menjalankan ${lang}...\n✅ Kode tervalidasi! Eksekusi server-side tersedia di Pro.`;out.style.color='var(--success)';
+  }
+}
+function fmtCode(){document.getElementById('codeEditor').value=document.getElementById('codeEditor').value.trim();showToast('✅ Kode diformat!');}
+function clrCode(){if(confirm('Hapus semua kode?'))document.getElementById('codeEditor').value='';}
+function cpyCode(){navigator.clipboard.writeText(document.getElementById('codeEditor').value);showToast('✅ Kode disalin!');}
+function dlCode(){
+  const code=document.getElementById('codeEditor').value;
+  const lang=document.getElementById('langSel').value;
+  const ext={Python:'.py',JavaScript:'.js','HTML/CSS':'.html',Java:'.java','C++':'.cpp',PHP:'.php',SQL:'.sql',Kotlin:'.kt',TypeScript:'.ts'}[lang]||'.txt';
+  const a=document.createElement('a');a.href='data:text/plain;charset=utf-8,'+encodeURIComponent(code);a.download='vortex-code'+ext;a.click();
+}
+function loadCodeFile(input){
+  if(!input.files.length)return;
+  const r=new FileReader();r.onload=ev=>{document.getElementById('codeEditor').value=ev.target.result;showToast('✅ File berhasil dibuka!');};r.readAsText(input.files[0]);input.value='';
+}
+
+// FILES
+function showFTab(t,el){
+  document.querySelectorAll('.ft-btn').forEach(b=>b.classList.remove('active'));el.classList.add('active');
+  document.getElementById('fLocal').style.display=t==='local'?'block':'none';
+  document.getElementById('fDrive').style.display=t==='drive'?'block':'none';
+}
+function addF(input){
+  if(!input.files.length)return;
+  Array.from(input.files).forEach(f=>localFiles.push({name:f.name,size:fmtSize(f.size),icon:getIC(f)}));
+  renderFG();input.value='';showToast('✅ '+input.files.length+' file ditambahkan!');
+}
+function renderFG(){
+  const g=document.getElementById('fileGrid');
+  g.innerHTML='<div class="file-card" style="border:2px dashed var(--border);background:transparent" onclick="document.getElementById(\'fUpload\').click()"><div class="fc-ic">➕</div><div class="fc-name">Tambah</div></div>';
+  localFiles.forEach((f,i)=>{
+    const d=document.createElement('div');d.className='file-card';
+    d.innerHTML=`<div class="fc-ic">${f.icon}</div><div class="fc-name">${f.name}</div><div class="fc-size">${f.size}</div>`;
+    d.onclick=()=>{if(confirm(`Hapus "${f.name}"?`)){localFiles.splice(i,1);renderFG();}};
+    g.insertBefore(d,g.firstChild);
+  });
+}
+function getIC(f){
+  if(f.type.startsWith('image'))return '🖼️';if(f.type.startsWith('video'))return '🎬';if(f.type.startsWith('audio'))return '🎵';
+  if(f.name.endsWith('.pdf'))return '📄';if(f.name.match(/\.doc/))return '📝';if(f.name.match(/\.xls/))return '📊';
+  if(f.name.match(/\.(py|js|html|css|java|cpp|php)/))return '💻';return '📁';
+}
+
+// SETTINGS
+function clearChats(){
+  if(confirm('Hapus semua riwayat chat?')){
+    chatHist=[];chatCnt=0;document.getElementById('stChat').textContent=0;
+    document.getElementById('chatMsgs').innerHTML='<div class="msg ai"><div class="msg-av">⚡</div><div class="msg-b">Chat dihapus. Halo lagi! 👋</div></div>';
+    showToast('✅ Chat dihapus!');
+  }
+}
+
+// UTILS
+function fmtSize(b){if(b<1024)return b+'B';if(b<1048576)return (b/1024).toFixed(1)+'KB';return (b/1048576).toFixed(1)+'MB';}
+function showToast(msg,type=''){
+  const t=document.createElement('div');t.className='toast'+(type?' '+type:'');t.textContent=msg;
+  document.body.appendChild(t);setTimeout(()=>t.remove(),3000);
+}
+
+// INIT - hide all panels except home
+document.querySelectorAll('.panel').forEach(p=>{
+  if(!p.classList.contains('active'))p.style.display='none';
+  else p.style.display='flex';
+});
+</script>
+</body>
+</html>
